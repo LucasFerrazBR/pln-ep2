@@ -15,7 +15,7 @@ def constroi_modelo_cnn():
     modelo = Sequential()
     
     modelo.add(embedding_layer)
-    modelo.add(Conv1D(filters=128, kernel_size=5, activation='relu'))
+    modelo.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
     modelo.add(MaxPooling1D(pool_size=2))
     #Dropouts reduzem o overfitting da rede ao desativar neurônios durante o treinamento
     modelo.add(Dropout(0.2))
@@ -69,14 +69,14 @@ embedding_layer = Embedding(num_palavras, tamanho_embedding, weights=[word2vec.w
 early_stopping = EarlyStopping(monitor='loss', min_delta=0, patience=2, verbose=0, mode='auto')
 
 #Transforma o modelo neural do Keras em um modelo que pode ser entendido pelo Sklearn (wrapper) e inicializa o treinamento e validações.
-rede_neural = KerasClassifier(build_fn=constroi_modelo_cnn, epochs=11)
+rede_neural = KerasClassifier(build_fn=constroi_modelo_cnn, epochs=8)
 kfolds = StratifiedKFold(n_splits=10, shuffle=True)
 resultado = cross_val_score(rede_neural, x_train_padded, y_train, cv=kfolds, scoring='accuracy', fit_params={'callbacks': [early_stopping]}).mean()
-print("Acuracia de treino: " + resultado)
+print("Acuracia de treino:" , resultado)
 
 #Testa a acuracia da rede com os dados de teste.
 rede_neural.fit(x_test_padded, y_test)
 predicao = rede_neural.predict(x_test_padded)
 acuracia = accuracy_score(predicao, y_test)
-print("Acuracia de teste: " + acuracia)
+print("Acuracia de teste:", acuracia)
 
